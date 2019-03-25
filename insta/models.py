@@ -1,9 +1,12 @@
 from django.db import models
+from tinymce.models import HTMLField
+from django.contrib.auth.models import User
 
 # Create your models here.
 class Profile(models.Model):
     profile = models.CharField(max_length =30)
-    bio = models.CharField(max_length =60)
+    bio = HTMLField()
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
 
     # def save_location(self):
     #     self.save()
@@ -21,8 +24,8 @@ class Profile(models.Model):
     def __str__(self):
         return self.name
 class Comments(models.Model):
-    comments = models.CharField(max_length =30)
-
+    comments =HTMLField()
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
     # def save_category(self):
     #     self.save()
        
@@ -45,7 +48,7 @@ class Comments(models.Model):
 class Image(models.Model):
     image = models.ImageField(upload_to = 'gallery/',blank=False)
     name = models.CharField(max_length =30)
-   
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
     caption = models.CharField(max_length =60)
     profile= models.ForeignKey(Profile)
     likes = models.CharField(max_length =60)
@@ -57,4 +60,4 @@ class Image(models.Model):
     def __str__(self):
         return self.name
     class Meta:
-        ordering = ['name']
+        ordering = ['name']        
