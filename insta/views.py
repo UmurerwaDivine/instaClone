@@ -24,7 +24,7 @@ def search_results(request):
         message = f"{search_term}"
 
         return render(request, 'all-insta/search.html',{"message":message,"articles": searched_articles})
-
+  
     else: 
         message = "You haven't searched for any term"
         return render(request, 'all-insta/search.html',{"message":message}) 
