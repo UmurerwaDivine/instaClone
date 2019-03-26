@@ -86,4 +86,4 @@ def image(request):
             image.save()
     else:
         form = NewImageForm()
-    return render(request,"all-insta/profile.html",{"profile":profile, "images":images, "form":form})
+    return render(request,"all-insta/newpost.html",{"profile":profile, "images":images, "form":form})
