@@ -20,7 +20,7 @@
       
       <body>
       
-        <form  action="{%url 'newpost'%}" method="post" enctype="multipart/form-data">
+        <form  action="{%url 'newpost' user%}" method="post" enctype="multipart/form-data">
           {%csrf_token%}
       
           {% bootstrap_form form%}

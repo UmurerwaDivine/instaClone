@@ -13,9 +13,8 @@ from .models import Comment, Image, Profile
 @login_required(login_url='/accounts/login/')
 def index(request):
     images = Image.objects.all()
-    comments = Comment.objects.all()
-    form = CommentForm()
-    return render(request,"all-insta/index.html",{"images":images,"form":form,"comments":comments})
+   
+    return render(request,"all-insta/index.html",{"images":images})
 # Create your views here.
 def search_results(request):
 
@@ -67,7 +66,7 @@ def search_results(request):
 
 #     return render(request,'all-insta/new-profile.html',{"form":form})
 @login_required(login_url='accounts/login/')
-def image(request):
+def image(request,user):
     current_user = request.user
     try:
         # user = User.objects.get(username = username)
