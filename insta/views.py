@@ -25,7 +25,7 @@ def search_results(request):
 
         return render(request, 'all-insta/search.html',{"message":message,"articles": searched_articles})
 
-    else:
+    else: 
         message = "You haven't searched for any term"
         return render(request, 'all-insta/search.html',{"message":message}) 
 # def new_profile(request):
