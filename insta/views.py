@@ -75,7 +75,7 @@ def image(request):
         images = Image.objects.get(profile = profile)
         
     except ObjectDoesNotExist:
-        return redirect('image',request.user)
+        return redirect('newpost',request.user)
 
     if request.method == 'POST':
         form = NewImageForm(request.POST,request.FILES)
