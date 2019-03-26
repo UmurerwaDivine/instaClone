@@ -2,3 +2,12 @@ h1
 {
   color: green;
 }
+.navbar-brand{font-family: 'Cookie', cursive;
+  font-size: 30px;
+  color:black;
+  
+}
+.container-fluid{
+  background-color: white;
+  border:1px white solid;
+}
