@@ -6,7 +6,7 @@ from django.contrib.auth.models import User
 class Profile(models.Model):
     profile = models.ImageField(upload_to = 'gallery/',blank=False)
     bio = HTMLField()
-    user = models.ForeignKey(User, on_delete=models.CASCADE,null=True)
+    user = models.OneToOneField(User, on_delete=models.CASCADE,null=True)
     def save_profile(self):
         self.save()
 
@@ -67,7 +67,7 @@ class Image(models.Model):
         self.save()
     @classmethod
     def get_images(cls):
-        images = cls.objects.all().order_by('-upload_date')
+        images = cls.objects.all()
         return images
 
     def save_image(self):
@@ -92,8 +92,8 @@ class Comment(models.Model):
 class Like(models.Model):
     likes = models.IntegerField()
     user = models.ForeignKey(User,on_delete=models.CASCADE)
-class Following(models.Model):
-    follower = models.IntegerField()
-    followee = models.IntegerField()
-    user = models.ForeignKey(User,on_delete=models.CASCADE)
-        
+class Follow(models.Model):
+     follower=models.ForeignKey(Profile, related_name='follower')
+     following=models.ForeignKey(Profile ,related_name='followee')
+
+   
