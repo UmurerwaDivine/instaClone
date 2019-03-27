@@ -1,128 +1,138 @@
+from django.shortcuts import render,redirect,get_object_or_404
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User
-from django.core.exceptions import ObjectDoesNotExist
-from django.http import Http404, HttpResponse, HttpResponseRedirect
-from django.shortcuts import redirect, render
-
-from .email import send_welcome_email
-from .form import CommentForm, NewImageForm, NewProfileForm
-from .models import Comment, Image, Profile,Follow
+from . form import ProfileUploadForm,CommentForm,ProfileForm,ImageForm
+from django.http  import HttpResponse
+from . models import Pic ,Profile, Likes, Follow, Comment,Unfollow
+from django.conf import settings
 
 
 # Create your views here.
-@login_required(login_url='accounts/login')
+@login_required(login_url='/accounts/login/')
 def index(request):
-    images = Image.objects.all().order_by('-upload_date')
-    comments = Comment.objects.all()
-    form = CommentForm()
-    return render(request,"all-insta/index.html",{"images":images,"form":form,"comments":comments})    
+      title = 'Instagram'
+      pic_posts = Pic.objects.all()
+      # comments = Comment.objects.all()
 
-@login_required(login_url='accounts/login/')
-def profile(request,username):
-    current_user = request.user
-    try:
-        user = User.objects.get(username = username)
-        profile = Profile.objects.get(user = current_user)
-        images = Image.objects.filter(profile = profile)
-        # following = Profile.objects.filter(follower = user).count()
-    
-    except ObjectDoesNotExist:
-        return redirect('edit_profile',current_user)
+    #   print(pic_posts)
+      return render(request, 'index.html', {"title":title,"pic_posts":pic_posts})
 
-    if request.method == 'POST':
-        form = NewImageForm(request.POST,request.FILES)
-        if form.is_valid():
-            image = form.save(commit=False)
-            image.user = current_user
-            image.profile = profile
-            image.save()
-    else:
-        form = NewImageForm()
-    return render(request,"all-insta/profile.html",{"profile":profile, "images":images, "form":form})
-# Create your views here.
+
+@login_required(login_url='/accounts/login/')
+def comment(request,id):
+	
+	post = get_object_or_404(Pic,id=id)	
+	current_user = request.user
+	# print(post)
+
+	if request.method == 'POST':
+		form = CommentForm(request.POST)
+
+		if form.is_valid():
+			comment = form.save(commit=False)
+			comment.user = current_user
+			comment.pic = post
+			comment.save()
+			return redirect('index')
+	else:
+		form = CommentForm()
+
+	return render(request,'comment.html',{"form":form})  
+
+
+@login_required(login_url='/accounts/login/')
+def profile(request):
+	 current_user = request.user
+	 profile = Profile.objects.all()
+	 follower = Follow.objects.filter(user = profile)
+
+	 return render(request, 'profile.html',{"current_user":current_user,"profile":profile,"follower":follower})
+
+@login_required(login_url='/accounts/login/')
+def timeline(request):
+	current_user = request.user 
+	Myprofile = Profile.objects.order_by('-time_uploaded')
+	comment = Comment.objects.order_by('-time_comment')
+	
+
+	return render(request, 'all-insta/timeline.html',{"Myprofile":Myprofile,"comment":comment})
+
+@login_required(login_url='/accounts/login/')
+def single_pic(request,pic_id):
+	pic = pic.objects.get(id= pic_id)
+
+	return render(request, 'all-insta/single_pic.html',{"pic":pic})
+
+@login_required(login_url='/accounts/login/')
+def like(request,pic_id):
+	Pic = Pic.objects.get(id=pic_id)
+	like +=1
+	save_like()
+	return redirect(timeline)
+
+
 def search_results(request):
-
-    if 'article' in request.GET and request.GET["article"]:
-        search_term = request.GET.get("article")
-        searched_articles = Image.search_by_title(search_term)
+    if 'pic' in request.GET and request.GET["pic"]:
+        search_term = request.GET.get("pic")
+        searched_profiles = Profile.search_profile(search_term)
         message = f"{search_term}"
 
-        return render(request, 'all-insta/search.html',{"message":message,"articles": searched_articles})
-  
-    else: 
-        message = "You haven't searched for any term"
-        return render(request, 'all-insta/search.html',{"message":message}) 
-def edit_profile(request,username):
-    current_user = request.user
-    if request.method == 'POST':
-        form = NewProfileForm(request.POST,request.FILES)
-        if form.is_valid():
-            bio = form.save(commit=False)
-            bio.user = current_user
-            bio.save()
-        return redirect('index')
-    elif Profile.objects.get(user=current_user):
-        profile = Profile.objects.get(user=current_user)
-        form = NewProfileForm(instance=profile)
+        return render(request, 'search_pic.html',{"message":message,"pics": searched_profiles})
+
     else:
-        form = NewProfileForm()
+        message = "You haven't searched for any term"
+        return render(request, 'search_pic.html',{"message":message})
 
-    return render(request,'all-insta/edit_profile.html',{"form":form})
-# def new_profile(request):
-#     current_user = request.user
-#     if request.method == 'POST':
-#         form = NewProfileForm(request.POST, request.FILES)
-#         if form.is_valid():
-#             profile = form.save(commit=False)
-#             profile.editor = current_user
-#             profile.save()
-#         return redirect('index')
 
-#     else:
-#         form = NewProfileForm()
-#     return render(request, 'all-insta/new-profile.html', {"form": form})
+@login_required(login_url='/accounts/login/')
+def upload_profile(request):
+    current_user = request.user 
+    title = 'Upload Profile'
+    try:
+        requested_profile = Profile.objects.get(user_id = current_user.id)
+        if request.method == 'POST':
+            form = ProfileUploadForm(request.POST,request.FILES)
 
-# @login_required(login_url='/accounts/login/') 
-# def profile(request):
-#     try:
-#         profile = Profile.objects.all()
-#     except ObjectDoesNotExist:
-#         raise Http404()
-#     return render(request,"all-insta/profile.html", {"profile":profile})
-# def new_profile(request):
-#     current_user = request.user
-#     if request.method == 'POST':
-#         form = NewProfileForm(request.POST,request.FILES)
-#         if form.is_valid():
-#             bio = form.save(commit=False)
-#             bio.user = current_user
-#             bio.save()
-#         return redirect('profile')
-#     elif Profile.objects.filter(user=current_user):
-#         profile = Profile.objects.filter(user=current_user).first()
-#         form = NewProfileForm(instance=profile)
-#     else:
-#         form = NewProfileForm()
+            if form.is_valid():
+                requested_profile.profile_pic = form.cleaned_data['profile_pic']
+                requested_profile.bio = form.cleaned_data['bio']
+                requested_profile.username = form.cleaned_data['username']
+                requested_profile.save_profile()
+                return redirect( 'profile' )
+        else:
+            form = ProfileUploadForm()
+    except:
+        if request.method == 'POST':
+            form = ProfileUploadForm(request.POST,request.FILES)
 
-#     return render(request,'all-insta/new-profile.html',{"form":form})
-# @login_required(login_url='accounts/login/')
-# def image(request,user):
-#     current_user = request.user
-#     try:
-#         # user = User.objects.get(username = username)
-#         profile = Profile.objects.get(user = current_user)
-#         images = Image.objects.get(profile = profile)
-        
-#     except ObjectDoesNotExist:
-#         return redirect('newpost',request.user)
+            if form.is_valid():
+                new_profile = Profile(profile_pic = form.cleaned_data['profile_pic'],bio = form.cleaned_data['bio'],username = form.cleaned_data['username'])
+                new_profile.save_profile()
+                return redirect( 'profile' )
+        else:
+            form = ProfileUploadForm()
 
-#     if request.method == 'POST':
-#         form = NewImageForm(request.POST,request.FILES)
-#         if form.is_valid():
-#             image = form.save(commit=False)
-#             image.user = current_user
-#             image.profile = profile
-#             image.save()
-#     else:
-#         form = NewImageForm()
-#     return render(request,"newpost.html",{"profile":profile, "images":images, "form":form})
+
+    return render(request,'upload_profile.html',{"title":title,"current_user":current_user,"form":form})
+
+
+@login_required(login_url='/accounts/login/')
+def send(request):
+    '''
+    View function that displays a forms that allows users to upload images
+    '''
+    current_user = request.user
+
+    if request.method == 'POST':
+
+        form = ImageForm(request.POST ,request.FILES)
+
+        if form.is_valid():
+            image = form.save(commit = False)
+            image.user_key = current_user
+            image.likes +=0
+            image.save() 
+
+            return redirect('timeline')
+    else:
+        form = ImageForm() 
+    return render(request, 'all-insta/send.html',{"form" : form}) 
