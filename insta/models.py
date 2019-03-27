@@ -7,6 +7,7 @@ class Profile(models.Model):
     profile = models.ImageField(upload_to = 'gallery/',blank=False)
     bio = HTMLField()
     user = models.OneToOneField(User, on_delete=models.CASCADE,null=True)
+    follow=models.NullBooleanField(default=False)
     def save_profile(self):
         self.save()
 

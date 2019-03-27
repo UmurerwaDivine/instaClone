@@ -6,15 +6,39 @@ from django.shortcuts import redirect, render
 
 from .email import send_welcome_email
 from .form import CommentForm, NewImageForm, NewProfileForm
-from .models import Comment, Image, Profile
+from .models import Comment, Image, Profile,Follow
 
 
 # Create your views here.
-@login_required(login_url='/accounts/login/')
+@login_required(login_url='accounts/login')
 def index(request):
-    images = Image.objects.all()
-   
-    return render(request,"all-insta/index.html",{"images":images})
+    images = Image.objects.all().order_by('-upload_date')
+    comments = Comment.objects.all()
+    form = CommentForm()
+    return render(request,"all-insta/index.html",{"images":images,"form":form,"comments":comments})    
+
+@login_required(login_url='accounts/login/')
+def profile(request,username):
+    current_user = request.user
+    try:
+        user = User.objects.get(username = username)
+        profile = Profile.objects.get(user = current_user)
+        images = Image.objects.filter(profile = profile)
+        # following = Profile.objects.filter(follower = user).count()
+    
+    except ObjectDoesNotExist:
+        return redirect('edit_profile',current_user)
+
+    if request.method == 'POST':
+        form = NewImageForm(request.POST,request.FILES)
+        if form.is_valid():
+            image = form.save(commit=False)
+            image.user = current_user
+            image.profile = profile
+            image.save()
+    else:
+        form = NewImageForm()
+    return render(request,"all-insta/profile.html",{"profile":profile, "images":images, "form":form})
 # Create your views here.
 def search_results(request):
 
@@ -28,6 +52,22 @@ def search_results(request):
     else: 
         message = "You haven't searched for any term"
         return render(request, 'all-insta/search.html',{"message":message}) 
+def edit_profile(request,username):
+    current_user = request.user
+    if request.method == 'POST':
+        form = NewProfileForm(request.POST,request.FILES)
+        if form.is_valid():
+            bio = form.save(commit=False)
+            bio.user = current_user
+            bio.save()
+        return redirect('index')
+    elif Profile.objects.get(user=current_user):
+        profile = Profile.objects.get(user=current_user)
+        form = NewProfileForm(instance=profile)
+    else:
+        form = NewProfileForm()
+
+    return render(request,'all-insta/edit_profile.html',{"form":form})
 # def new_profile(request):
 #     current_user = request.user
 #     if request.method == 'POST':
@@ -65,24 +105,24 @@ def search_results(request):
 #         form = NewProfileForm()
 
 #     return render(request,'all-insta/new-profile.html',{"form":form})
-@login_required(login_url='accounts/login/')
-def image(request,user):
-    current_user = request.user
-    try:
-        # user = User.objects.get(username = username)
-        profile = Profile.objects.get(user = current_user)
-        images = Image.objects.get(profile = profile)
+# @login_required(login_url='accounts/login/')
+# def image(request,user):
+#     current_user = request.user
+#     try:
+#         # user = User.objects.get(username = username)
+#         profile = Profile.objects.get(user = current_user)
+#         images = Image.objects.get(profile = profile)
         
-    except ObjectDoesNotExist:
-        return redirect('newpost',request.user)
+#     except ObjectDoesNotExist:
+#         return redirect('newpost',request.user)
 
-    if request.method == 'POST':
-        form = NewImageForm(request.POST,request.FILES)
-        if form.is_valid():
-            image = form.save(commit=False)
-            image.user = current_user
-            image.profile = profile
-            image.save()
-    else:
-        form = NewImageForm()
-    return render(request,"newpost.html",{"profile":profile, "images":images, "form":form})
+#     if request.method == 'POST':
+#         form = NewImageForm(request.POST,request.FILES)
+#         if form.is_valid():
+#             image = form.save(commit=False)
+#             image.user = current_user
+#             image.profile = profile
+#             image.save()
+#     else:
+#         form = NewImageForm()
+#     return render(request,"newpost.html",{"profile":profile, "images":images, "form":form})
