@@ -11,7 +11,7 @@
           </div>
 <div class="row">
 <div class="col-md-6"></div>
-<form  action="{% url 'upload' %}" method="post" enctype="multipart/form-data" style="margin-top: -400px;">
+<form  action="{% url 'upload' %}" method="post" enctype="multipart/form-data" >
 {% csrf_token %}
 {% bootstrap_form form%}
 <div class="form-group" >

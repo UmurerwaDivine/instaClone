@@ -28,17 +28,17 @@
 
 <h2></h2>
  {% for pic in pic_posts%}
-<div class="card" style="margin-left: 200px;padding-top:20px">
+<div class="card" style="margin-left: 200px; margin-top: 80px">
   <div class="container" style="border-top: 1px solid #EEEEEE; width: 515px; height: 100px"><br><br>
-      <h2><!-- {{pic.user}} --></h2>
+      
       <img src="{{pic.pic.url}}" class="master-card" style="width:100px;height:100px;border-radius:50%;padding:15px; margin-top: -60px"><strong style="margin-top: 60px"><a style="color: black" href="{% url 'profile' %}">{{pic.user}}</strong>
   </div>
 
-<img src="{{pic.pic.url}}" alt="image"  style="width:514px; ">
+<img src="{{pic.pic.url}}" alt=""  style="width:514px; ">
 <div class="container" style="margin: 50px">
 <div class="row">
   <div class="col-md-3">
-    <i onclick="myFunction(this)" class="fa fa-heart" style="font-size:28px;  background-color: white ; margin-top: -200px; margin-left: -30px"></i>
+    <i class="fa fa-heart" style="font-size:28px;  background-color: white ; margin-top: -200px; margin-left: -30px"></i>
      <a href="{% url 'comment' id=pic.pk %} "><i class="fa fa-comment-o" style="font-size:24px; margin-left: 20px"></i></a>
   </div>
 
@@ -67,35 +67,25 @@
   </div>
 </div>
 </div>
-<div style="border:1px solid #EEEEEE;width:300px;height:350px;overflow:auto; float: right;margin-top: -5270px; margin-right: 200px ; border-left: none; border-top: none;">
- <div style="margin-top: -5px"> <strong style="color: #BDBDBD">Stories</strong><strong style="float: right;">Watch All</strong></div>
- <!--   {% for pic in pic_posts%} -->
-
-   <div>
-  <img src="{{pic.pic.url}}" class="master-card" style="width:100px;height:100px;border-radius:50%;padding:15px; "><strong style="margin-top: 60px">{{pic.user}}</strong>
-  <p style="margin-left: 80px; margin-top: 40px">{{pic.pub_date | timesince}} </p>
-</div>
-
-
-
-<script>
-function myFunction(x) {
-    x.classList.toggle("fa-thumbs-down");
-}
-</script>
-
 {% endfor %}
 
 
 
 
+<div style="border:1px solid #EEEEEE;width:300px;height:350px;overflow:auto; float: right;margin-top: -4990px; margin-right: 200px ; border-left: none; border-top: none;">
+ <div style="margin-top: -5px"> <strong style="color: #BDBDBD">Stories</strong><strong style="float: right;">Watch All</strong></div>
+  {% for pic in pic_posts%}
 
-<!--   {% endfor %} -->
+   <div>
+  <img src="{{pic.pic.url}}" class="master-card" style="width:100px;height:100px;border-radius:50%;padding:15px; "><strong style="margin-top: 60px">{{pic.user}}</strong>
+  <p style="margin-left: 80px; margin-top: 40px">{{pic.pub_date | timesince}} </p>
+</div>
+{% endfor %}
 
 
 
 </div><br>
-
 </body>
 </html>
+
 {% endblock %}
