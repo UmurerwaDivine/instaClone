@@ -12,11 +12,10 @@ Follow other users and see their pictures on my timeline.
 Like a picture and leave a comment on it.
 
 ### Technologies Used
-Python version 3.6.3
+Python version 3.6.7
 Django version 1.11
 Bootstrap 3
 Postgres Database
-Sqlite
 HTML & CSS
 Heroku
 
