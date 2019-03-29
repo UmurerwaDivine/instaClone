@@ -1,4 +1,4 @@
-#Instagram Clone
+# Instagram Clone
 
 Instagram Clone is an application that lets you display your photos for others to view,comment,like,follow and unfollow.
 
