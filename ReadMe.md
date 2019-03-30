@@ -22,7 +22,7 @@ Heroku
 ### License
 This project is licenced under the MIT License.
 
-### Author
+### Author 
 Umurerwa Divine
 
 ###Contacts 
