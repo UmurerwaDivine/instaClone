@@ -26,4 +26,4 @@ This project is licenced under the MIT License.
 Umurerwa Divine
 
 ###Contacts
-```divinekagame@gmail.com```
+```divinekagame@gmail.com``` 
